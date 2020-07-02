@@ -28,7 +28,9 @@ Alternatively, you can install the package from gitlab. Call the following
 commands in an R session. 
 
 ```{r install_fromgit}
-remotes::install_gitlab('kabaum/LoopDetectR')
+# Install the package including the vignette and the manual
+remotes::install_gitlab('kabaum/LoopDetectR', build_manual=TRUE, 
+                        build_vignettes=TRUE)
 # Load package
 library("LoopDetectR")
 ```
