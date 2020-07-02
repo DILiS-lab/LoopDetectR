@@ -2,11 +2,10 @@ Package: LoopDetectR
 Type: Package
 Title: Comprehensive Feedback Loop Detection in ODE Models
 Version: 0.1.0
-Authors@R: c(person("Katharina", "Baum", email = "katharina.baum@hpi.de", 
-                  comment = c(ORCID = "0000-0001-7256-0566"),
+Authors@R: c(person("Katharina", "Baum", email = "katharina.baum@hpi.de",
                   role = c("aut", "cre")), 
            person("Sandra", "Kr<U+00FC>ger", role = c("ctb")))
-Description: This package can be used to detect feedback loops (cycles, circuits) between species in ODE models. These are paths from one node to itself without visiting any other node twice, and they have important regulatory functions. Together with the loop length it is also reported whether the loop is a positive or a negative feedback loop. An upper limit of the number of feedback loops can be entered to limit the runtime (which scales with feedback loop count). Model parametrizations and values of the modelled variables are accounted for. Input can be the Jacobian matrix of the ODE model or the function definition. Graph-based algorithms from igraph are employed for path detection. 
+Description: Detect feedback loops (cycles, circuits) between species in ODE models. These are paths from one node to itself without visiting any other node twice, and they have important regulatory functions. The loop length is reported, and whether the loop is a positive or a negative feedback loop. An upper limit of the number of feedback loops limits runtime (which scales with feedback loop count). Model parametrizations and values of the modelled variables are accounted for. Input can be the Jacobian matrix of the ODE model or the function definition. Graph-based algorithms from igraph are employed for path detection. 
 Imports:
     igraph, numDeriv
 Suggests:
