@@ -17,10 +17,8 @@ Graph-based algorithms from igraph are employed for path detection.
 Install the package from gitlab. Call the following 
 commands in an R session. 
 
-	# url where the package is located in gitlab
-	loopdetect_url <- "https:/gitlab.com/kabaum/LoopDetectR"
 	# Install from gitlab
-	devtools::install_git(loopdetect_url)
+	remotes::install_gitlab(kabaum/LoopDetectR, build_manual =TRUE, build_vignettes=TRUE)
 	# Load package
 	library("LoopDetectR")
 
