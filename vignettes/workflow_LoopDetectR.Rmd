@@ -28,10 +28,7 @@ Alternatively, you can install the package from gitlab. Call the following
 commands in an R session. 
 
 ```{r install_fromgit, eval=FALSE}
-# url where the package is located in gitlab
-loopdetect_url <- "https:/gitlab.com/kabaum/LoopDetectR"
-# Install from gitlab
-devtools::install_git(loopdetect_url)
+remotes::install_gitlab('kabaum/LoopDetectR')
 # Load package
 library("LoopDetectR")
 ```
