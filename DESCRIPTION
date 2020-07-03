@@ -9,7 +9,7 @@ Description: Detect feedback loops (cycles, circuits) between species in ODE mod
 Imports:
     igraph, numDeriv
 Suggests:
-    deSolve, knitr, remotes, rmarkdown, utils 
+    deSolve, knitr, markdown, remotes, rmarkdown, utils 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
