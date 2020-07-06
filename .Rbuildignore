@@ -7,3 +7,5 @@ README.md
 ^\.DS_Store
 ^\.git$
 cran_comments.md
+^doc$
+^Meta$
