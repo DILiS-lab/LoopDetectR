@@ -27,7 +27,7 @@ commands in an R session.
 
 ```{r install_fromgit, message=FALSE, results='hide', eval=FALSE}
 # Install the package including the vignette and the manual
-remotes::install_gitlab('kabaum/LoopDetectR', build_manual=TRUE, 
+remotes::install_gitlab("kabaum/LoopDetectR", build_manual=TRUE, 
                         build_vignettes = TRUE)
 
 ```
