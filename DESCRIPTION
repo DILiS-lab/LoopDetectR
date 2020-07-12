@@ -1,7 +1,7 @@
 Package: LoopDetectR
 Type: Package
 Title: Comprehensive Feedback Loop Detection in ODE Models
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(person("Katharina", "Baum", email = "katharina.baum@hpi.de",
                   role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7256-0566")), 
            person("Sandra", "Krüger", role = c("ctb")))
