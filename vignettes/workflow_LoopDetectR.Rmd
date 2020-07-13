@@ -111,15 +111,6 @@ Note: You can skip this step if you already have a point of interest in state
 space, or if you want to use dummy values for the variables such as 
 `s_star <- 1:4`.
 
-```{r install_desolve, eval = FALSE}
-# install package deSolve for solving the ODE
-install.packages("deSolve")
-```
-```{r load_desolve}
-# load the package deSolve
-library('deSolve')
-```
-
 ```{r solving_ODE}
 # Load example ODE system with function func_POSm4, 
 # Positive feedback chain model from [Baum et al., 2016], 4 variables
