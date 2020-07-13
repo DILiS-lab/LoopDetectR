@@ -19,7 +19,7 @@ LoopDetectR is on CRAN and can be installed within R by
 
 ```{r install_fromCRAN, eval=FALSE}
 # Download and install
-utils::install.packages("LoopDetectR")
+install.packages("LoopDetectR")
 ```
 
 Alternatively, you can install the package from gitlab. Call the following 
@@ -109,11 +109,14 @@ finding in graphs uses algorithms supplied in the package `igraph`.
 Solving an ODE model can be performed with the package `deSolve`.
 Note: You can skip this step if you already have a point of interest in state 
 space, or if you want to use dummy values for the variables such as 
-`s_tar <- 1:4`.
+`s_star <- 1:4`.
 
+```{r install_desolve, eval = FALSE}
+# install package deSolve for solving the ODE
+install.packages("deSolve")
+```
 ```{r load_desolve}
-# install and load package deSolve for solving the ODE
-install.packages("deSolve",repos="https://cloud.r-project.org")
+# load the package deSolve
 library('deSolve')
 ```
 
