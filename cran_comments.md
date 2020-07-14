@@ -1,16 +1,13 @@
-##Resubmission v. 0.1.1
-This is a resubmission to the initial package version 0.1.0.
+##Resubmission v. 0.1.2
+This is a resubmission to the initial package version 0.1.1.
 
-* adapted DESCRIPTION: explain acronym ODE, add method reference (and slightly more detail), set employed package names in single quotes
-* corrected author name: Sandra Krüger
-* added Orcid ID for author
-* suppress installation of package during vignette creation
-* write files to and from tempdir() only in vignette and examples
+Introduced changes
+* suppress installation of all packages during vignette creation (deSolve...)
+* checked all examples: they do not install any package
 
-
-## Test environments for version 0.1.1
+## Test environments for version 0.1.2
 * local OS X install (R 4.0.2, R-devel 2020-07-01 r78761)
-* win-builder (4.0.2, R-devel 2020-07-08 r78794)
+* win-builder (4.0.2, R-devel 2020-07-11 r788124)
 
 
 ## R CMD check results
