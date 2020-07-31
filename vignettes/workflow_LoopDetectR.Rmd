@@ -168,7 +168,7 @@ $J_{ij}=\delta S_i/\delta S_j$, which is positive if $S_j$ has a direct positive
 effect on $S_i$, negative if $S_j$ has a direct negative effect on $S_i$ and zero
 if $S_j$ does not have a direct effect on $S_i$. For example, the entry in row 2,
 column 4, $J_{24}$, of the `signed_jacobian` matrix above is positive, meaning that
-in the underlying ODE model, variable 4 positively regulates variable 1.
+in the underlying ODE model, variable 4 positively regulates variable 2.
     
 ## Computing all feedback loops and useful functions for loop search
 
@@ -351,10 +351,11 @@ loop_list_neg <- find_loops(j_matrix_neg);
 
 # Compute comparison
 comp_inds <- compare_loop_list(loop_list_pos,loop_list_neg)
-# Only the four self-loops remain identical in both systems (saved in ind_a_id).
+# Only the four self-loops remain identical in both systems (the indices
+# with respect to the first input list, loop_list_pos, are saved in ind_a_id).
 loop_list_pos[comp_inds$ind_a_id,]
 # ind_b_id saves the indices of the corresponding loops in the negatively 
-# regulated system.
+# regulated system, loop_list_neg.
 loop_list_neg[comp_inds$ind_b_id,]
 # Two loops are the same in both systems but they have switched their signs. 
 # Their indices in the first list are saved in ind_a_switch

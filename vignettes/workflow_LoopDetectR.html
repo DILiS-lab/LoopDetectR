@@ -422,7 +422,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## [3,]  0.0000000   550 -82.4   0.0000
 ## [4,]  0.0000000     0  78.0  -5.1000</code></pre>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>signed_jacobian &lt;-<span class="st"> </span><span class="kw">sign</span>(j_matrix)</span></code></pre></div>
-<p>The (i,j)th entry of the Jacobian matrix denotes the partial derivative of variable <span class="math inline">\(S_i\)</span> with respect to variable <span class="math inline">\(S_j\)</span>, <span class="math inline">\(J_{ij}=\delta S_i/\delta S_j\)</span>, which is positive if <span class="math inline">\(S_j\)</span> has a direct positive effect on <span class="math inline">\(S_i\)</span>, negative if <span class="math inline">\(S_j\)</span> has a direct negative effect on <span class="math inline">\(S_i\)</span> and zero if <span class="math inline">\(S_j\)</span> does not have a direct effect on <span class="math inline">\(S_i\)</span>. For example, the entry in row 2, column 4, <span class="math inline">\(J_{24}\)</span>, of the <code>signed_jacobian</code> matrix above is positive, meaning that in the underlying ODE model, variable 4 positively regulates variable 1.</p>
+<p>The (i,j)th entry of the Jacobian matrix denotes the partial derivative of variable <span class="math inline">\(S_i\)</span> with respect to variable <span class="math inline">\(S_j\)</span>, <span class="math inline">\(J_{ij}=\delta S_i/\delta S_j\)</span>, which is positive if <span class="math inline">\(S_j\)</span> has a direct positive effect on <span class="math inline">\(S_i\)</span>, negative if <span class="math inline">\(S_j\)</span> has a direct negative effect on <span class="math inline">\(S_i\)</span> and zero if <span class="math inline">\(S_j\)</span> does not have a direct effect on <span class="math inline">\(S_i\)</span>. For example, the entry in row 2, column 4, <span class="math inline">\(J_{24}\)</span>, of the <code>signed_jacobian</code> matrix above is positive, meaning that in the underlying ODE model, variable 4 positively regulates variable 2.</p>
 </div>
 <div id="computing-all-feedback-loops-and-useful-functions-for-loop-search" class="section level2">
 <h2>Computing all feedback loops and useful functions for loop search</h2>
@@ -582,15 +582,16 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb42-19"><a href="#cb42-19"></a></span>
 <span id="cb42-20"><a href="#cb42-20"></a><span class="co"># Compute comparison</span></span>
 <span id="cb42-21"><a href="#cb42-21"></a>comp_inds &lt;-<span class="st"> </span><span class="kw">compare_loop_list</span>(loop_list_pos,loop_list_neg)</span>
-<span id="cb42-22"><a href="#cb42-22"></a><span class="co"># Only the four self-loops remain identical in both systems (saved in ind_a_id).</span></span>
-<span id="cb42-23"><a href="#cb42-23"></a>loop_list_pos[comp_inds<span class="op">$</span>ind_a_id,]</span></code></pre></div>
+<span id="cb42-22"><a href="#cb42-22"></a><span class="co"># Only the four self-loops remain identical in both systems (the indices</span></span>
+<span id="cb42-23"><a href="#cb42-23"></a><span class="co"># with respect to the first input list, loop_list_pos, are saved in ind_a_id).</span></span>
+<span id="cb42-24"><a href="#cb42-24"></a>loop_list_pos[comp_inds<span class="op">$</span>ind_a_id,]</span></code></pre></div>
 <pre><code>##   loop length sign
 ## 1 1, 1      1   -1
 ## 2 2, 2      1   -1
 ## 3 3, 3      1   -1
 ## 4 4, 4      1   -1</code></pre>
 <div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a><span class="co"># ind_b_id saves the indices of the corresponding loops in the negatively </span></span>
-<span id="cb44-2"><a href="#cb44-2"></a><span class="co"># regulated system.</span></span>
+<span id="cb44-2"><a href="#cb44-2"></a><span class="co"># regulated system, loop_list_neg.</span></span>
 <span id="cb44-3"><a href="#cb44-3"></a>loop_list_neg[comp_inds<span class="op">$</span>ind_b_id,]</span></code></pre></div>
 <pre><code>##   loop length sign
 ## 1 1, 1      1   -1
