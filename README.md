@@ -14,7 +14,7 @@ Graph-based algorithms from igraph are employed for path detection.
 
 ## Installation
 
-LoopDetectR is on CRAN [link]<https://cran.r-project.org/web/packages/LoopDetectR/index.html>and can be installed within an R session.
+LoopDetectR is on CRAN [link](https://cran.r-project.org/web/packages/LoopDetectR/index.html) and can be installed within an R session.
 
 	# Download and install
 	utils::install.packages("LoopDetectR")
@@ -31,11 +31,11 @@ commands in an R session.
 
 ## Workflow and documentation
 
-A detailed workflow document can be found in the *vignettes* folder and as CRAN [vignette]<https://cran.r-project.org/web/packages/LoopDetectR/vignettes/workflow_LoopDetectR.html>. Each function is documented. For example, type
+A detailed workflow document can be found in the *vignettes* folder and as CRAN [vignette](https://cran.r-project.org/web/packages/LoopDetectR/vignettes/workflow_LoopDetectR.html). Each function is documented. For example, type
 
 	help('find_loops')
 
-within an R session with installed and loaded LoopDetectR to obtain details on the function `find_loops`. For an overview of the functions, download the [reference manual]<https://cran.r-project.org/web/packages/LoopDetectR/LoopDetectR.pdf>.
+within an R session with installed and loaded LoopDetectR to obtain details on the function `find_loops`. For an overview of the functions, download the [reference manual](https://cran.r-project.org/web/packages/LoopDetectR/LoopDetectR.pdf).
 
 
 ## Licensing
