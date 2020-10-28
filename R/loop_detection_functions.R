@@ -447,7 +447,7 @@ find_loops_vset <- function(fun, vset, ..., max_num_loops=100000, compute_full_l
                 tn_sn_ind <- which(!((J_temp-jac_rep[[j]])==0),arr.ind=T)
                 #find loops that contain any of the edges
                 for (k in 1:length(tn_sn_ind)) {
-                    if (length(find_edge(loop_rep[[j]],
+                    if (length(find_edge(loop_rep[[loop_rep_index[jac_rep_index==j][1]]],#bug fixed on Oct 12, 2020, was loop_rep[[j]]
                                           tn_sn_ind[k,2],tn_sn_ind[k,1]))>0){
                         #in case we found an edge that is affected
                         existing_loop_changed[j] <- TRUE
