@@ -2,7 +2,7 @@
 
 ## Scope of the package
 This package can be used to detect feedback loops (cycles, circuits) 
-between species in ODE models. These are paths from one node to itself without 
+between species in ordinary differential equation (ODE) models. These are paths from one node to itself without 
 visiting any other node twice, and they have important regulatory functions. 
 Together with the loop length it is also reported whether the loop is a positive 
 or a negative feedback loop. An upper limit of the number of feedback loops can 
