@@ -11,4 +11,4 @@ README.md$
 cran_comments.md$
 ^doc$
 ^Meta$
-^\old$
+^\.old$
