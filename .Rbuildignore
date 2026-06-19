@@ -1,7 +1,9 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^\.Rhistory
-^\.gitignore
+(^|/)\.Rhistory$
+^\.gitignore$
+^\.github$
 LICENSE
 README.md
 ^\.DS_Store

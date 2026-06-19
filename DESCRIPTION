@@ -17,3 +17,5 @@ Depends:
     R (>= 4.0.0)
 RoxygenNote: 7.1.0
 VignetteBuilder: knitr
+URL: https://github.com/DILiS-lab/LoopDetectR, https://cran.r-project.org/package=LoopDetectR
+BugReports: https://github.com/DILiS-lab/LoopDetectR/issues
