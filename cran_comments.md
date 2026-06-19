@@ -1,25 +1,26 @@
-##Resubmission v. 0.1.2
-This is a resubmission to the initial package version 0.1.1.
+##LoopDetectR v. 0.1.3
 
-Introduced changes
-* suppress installation of all packages in the vignette (I had overlooked one, sorry for that)
-* checked all examples in the help files: they do not install any package
+## Changes
 
-## Test environments for version 0.1.2
-* local OS X install (R 4.0.2, R-devel 2020-07-01 r78761)
-* win-builder (4.0.2, R-devel 2020-07-11 r788124)
+This is a maintenance release.
 
+* Updated installation instructions from GitLab to GitHub.
+* Updated repository links to point to `DILiS-lab/LoopDetectR`.
+* Removed local development history files from the source repository.
+* Added GitHub Actions checks for R CMD check.
 
 ## R CMD check results
-There were no ERRORs or WARNINGs. 
 
-* checking CRAN incoming feasibility ... NOTE
-Maintainer: ‘Katharina Baum <katharina.baum@hpi.de>’
+0 errors | 0 warnings | 0 notes
 
-New submission
-This is correct, it is (the resubmission of) a new submission.
+## Test environments
 
-
+* GitHub Actions: macOS-latest, R release
+* GitHub Actions: Windows-latest, R release
+* GitHub Actions: Ubuntu-latest, R devel
+* GitHub Actions: Ubuntu-latest, R release
+* GitHub Actions: Ubuntu-latest, R oldrel-1
 
 ## Downstream dependencies
+
 There are currently no downstream dependencies for this package.

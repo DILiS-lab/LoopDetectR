@@ -15,7 +15,7 @@ Encoding: UTF-8
 LazyData: true
 Depends: 
     R (>= 4.0.0)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 URL: https://github.com/DILiS-lab/LoopDetectR, https://cran.r-project.org/package=LoopDetectR
 BugReports: https://github.com/DILiS-lab/LoopDetectR/issues
