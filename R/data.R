@@ -20,7 +20,7 @@
 #' Division Cycle of Caulobacter crescentus Stalked Cells. Plos Comput Biol. 
 #' 2008;4(1):e9. The solutions were generated with MATLAB using the
 #' functions accompanying the above reference on 
-#' \url{http://mpf.biol.vt.edu/research/caulobacter/SWST/pp/}.
+#' \doi{10.1371/journal.pcbi.0040009}.
 #' 
 "li08_solution"
 
@@ -59,7 +59,7 @@
 #' Li S, Brazhnik P, Sobral B, Tyson JJ. A Quantitative Study of the 
 #' Division Cycle of Caulobacter crescentus Stalked Cells. Plos Comput Biol. 
 #' 2008;4(1):e9. The function corresponds to the MATLAB function modelwtin(t,y)
-#' as given on \url{http://mpf.biol.vt.edu/research/caulobacter/SWST/pp/}.
+#' as given on \doi{10.1371/journal.pcbi.0040009}.
 #' 
 #' @details
 #' The Caulobacter cell cycle model function will only give the solution as 
