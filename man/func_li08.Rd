@@ -14,7 +14,7 @@ The Caulobacter cell cycle model was proposed in
 Li S, Brazhnik P, Sobral B, Tyson JJ. A Quantitative Study of the 
 Division Cycle of Caulobacter crescentus Stalked Cells. Plos Comput Biol. 
 2008;4(1):e9. The function corresponds to the MATLAB function modelwtin(t,y)
-as given on \url{http://mpf.biol.vt.edu/research/caulobacter/SWST/pp/}.
+as given on \doi{10.1371/journal.pcbi.0040009}.
 }
 \usage{
 func_li08
