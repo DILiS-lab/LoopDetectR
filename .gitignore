@@ -10,6 +10,15 @@ source/
 LoopDetectR.Rproj
 /LoopDetectR.Rcheck
 
+.Rhistory
+.Rproj.user/
+*.Rproj
+.DS_Store
+doc/
+Meta/
+*.tar.gz
+*.Rcheck/
+
 
 # Compiled source #
 ###################
@@ -40,6 +49,10 @@ __pycache__
 *.log
 *.sql
 *.sqlite
+
+# Backup #
+######################
+old/
 
 # OS generated files #
 ######################
