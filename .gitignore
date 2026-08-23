@@ -8,6 +8,7 @@ source/
 /.Rhistory
 /.Rproj.user/*
 LoopDetectR.Rproj
+/LoopDetectR.Rcheck
 
 .Rhistory
 .Rproj.user/

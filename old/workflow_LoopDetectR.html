@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Katharina Baum" />
+
+<meta name="date" content="2020-07-06" />
+
+<title>LoopDetectR: Comprehensive Feedback Loop Detection in ODE models</title>
+
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">LoopDetectR: Comprehensive Feedback Loop Detection in ODE models</h1>
+<h4 class="author">Katharina Baum</h4>
+<h4 class="date">07/06/2020</h4>
+
+
+
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>LoopDetectR is on CRAN and can be installed within R by</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Download and install</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">install.packages</span>(<span class="st">&quot;LoopDetectR&quot;</span>)</span></code></pre></div>
+<p>Alternatively, you can install the package from gitlab. Call the following commands in an R session.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Install the package including the vignette and the manual</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>remotes<span class="op">::</span><span class="kw">install_gitlab</span>(<span class="st">&quot;kabaum/LoopDetectR&quot;</span>, <span class="dt">build_manual=</span><span class="ot">TRUE</span>, </span>
+<span id="cb2-3"><a href="#cb2-3"></a>                        <span class="dt">build_vignettes =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p>After installation, load the package.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># Load package</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">library</span>(<span class="st">&quot;LoopDetectR&quot;</span>)</span></code></pre></div>
+</div>
+<div id="in-brief-and-quick-start" class="section level2">
+<h2>In brief and quick start</h2>
+<p>The package LoopDetectR enables determining all feedback loops of an ordinary differential equation (ODE) system at user-defined values of the model parameters and of the modelled variables.</p>
+<p>The following call reports (up to 10) feedback loops for an ODE system determined by a function, here the example function <code>func_POSm4</code>, at variable values <code>s_star</code> (here, these are all equal to 1). Additional arguments to the example function are supplied.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Load example ODE system with function func_POSm4, 4 variables</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">data</span>(<span class="st">&quot;func_POSm4&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co"># Example variable values</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>s_star &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">4</span>)</span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co"># Further arguments of func_POSm4, in addition: time t as argument</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>klin &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">8</span>)</span>
+<span id="cb4-7"><a href="#cb4-7"></a>knonlin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">2.5</span>,<span class="dv">3</span>)</span>
+<span id="cb4-8"><a href="#cb4-8"></a></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="co"># compute loops</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>res_tab &lt;-<span class="st"> </span><span class="kw">find_loops_vset</span>(func_POSm4,<span class="dt">vset=</span><span class="kw">list</span>(s_star),<span class="dt">t=</span><span class="dv">1</span>,<span class="dt">klin=</span>klin,</span>
+<span id="cb4-11"><a href="#cb4-11"></a>                           <span class="dt">knonlin=</span>knonlin,<span class="dt">max_num_loops=</span><span class="dv">10</span>)</span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co"># The loop list is reported</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>res_tab<span class="op">$</span>loop_rep[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>##           loop length sign
+## 1         1, 1      1   -1
+## 2         2, 2      1   -1
+## 3         3, 3      1   -1
+## 4         4, 4      1   -1
+## 5 3, 4, 1,....      4   -1
+## 6   3, 4, 2, 3      3    1</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># This is the sixth loop of the list. It is a positive feedback loop (sign in </span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># the loop list equals +1) of length 3 in that variable 3 regulates variable 4, </span></span>
+<span id="cb6-3"><a href="#cb6-3"></a><span class="co"># variable 4 regulates variable 2, and variable 2 regulates variable 3. </span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>res_tab<span class="op">$</span>loop_rep[[<span class="dv">1</span>]][<span class="dv">6</span>,]</span></code></pre></div>
+<pre><code>##         loop length sign
+## 6 3, 4, 2, 3      3    1</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># The corresponding signed Jacobian matrix</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>res_tab<span class="op">$</span>jac_rep[[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>##      [,1] [,2] [,3] [,4]
+## [1,]   -1    0    0   -1
+## [2,]    1   -1    0    1
+## [3,]    0    1   -1    0
+## [4,]    0    0    1   -1</code></pre>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Ordinary differential equation (ODE) models are used frequently to mathematically represent biological systems. Feedback loops are important regulatory features of biological systems and can give rise to different dynamic behavior such as multistability for positive feedback loops or oscillations for negative feedback loops.</p>
+<p>The feedback loops in an ODE system can be detected with the help of its Jacobian matrix, the matrix of partial derivatives of the variables. It captures all interactions between the variables and gives rise to the interaction graph of the ODE model. In this graph, each modelled variable is a node and non-zero entries in the Jacobian matrix are (weighted) edges of the graph. Interactions can be positive or negative, according to the sign of the Jacobian matrix entry.</p>
+<p>Directed path detection in this graph is used to determine all feedback loops (in graphs also called cycles or circuits) of the system. They are marked by a set of directed interactions forming a chain in which only the first and the last node (variable) is the same. Thereby, self-loops (loops of length one) can also occur.</p>
+<p>LoopDetectR allows for detection of all loops of the graph and also reports the sign of each loop, i.e. whether it is a positive feedback loop (the number of negative interactions is even) or a negative feedback loop (the number of negative interactions is uneven). The output is a table that captures the order of the variables forming the loop, their length and the sign of each loop.</p>
+<p>Jacobian determination in LoopDetectR relies on the package <code>numDeriv</code>, and path finding in graphs uses algorithms supplied in the package <code>igraph</code>.</p>
+</div>
+<div id="solving-the-ode-model-to-generate-variable-values-of-interest" class="section level2">
+<h2>Solving the ODE model to generate variable values of interest</h2>
+<p>Solving an ODE model can be performed with the package <code>deSolve</code>. Note: You can skip this step if you already have a point of interest in state space, or if you want to use dummy values for the variables such as <code>s_star &lt;- 1:4</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Load example ODE system with function func_POSm4, </span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co"># Positive feedback chain model from [Baum et al., 2016], 4 variables</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">data</span>(func_POSm4)</span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="co"># The function func_POSm4 returns a vector, but deSolve needs the vector within</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co"># a list as output. Therefore, we define a function that simply puts the output </span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co"># of func_POSm4 into a list:</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a>func_POSm4_list &lt;-<span class="st"> </span><span class="cf">function</span>(t,x,klin,knonlin){<span class="kw">list</span>(<span class="kw">func_POSm4</span>(t,x,klin,knonlin))}</span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="co"># Kinetic parameters of the model, supplied as arguments to func_POSm4</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a>klin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">165</span>,<span class="fl">0.044</span>,<span class="fl">0.27</span>,<span class="dv">550</span>,<span class="dv">5000</span>,<span class="dv">78</span>,<span class="fl">4.4</span>,<span class="fl">5.1</span>)</span>
+<span id="cb10-10"><a href="#cb10-10"></a>knonlin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.3</span>,<span class="dv">2</span>)</span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="co"># Solve the system using deSolve</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a>sol &lt;-<span class="st">  </span>deSolve<span class="op">::</span><span class="kw">ode</span>(<span class="dt">y =</span> <span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">4</span>), <span class="dt">times =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">15</span>,<span class="fl">0.1</span>), <span class="dt">func =</span> func_POSm4_list, </span>
+<span id="cb10-13"><a href="#cb10-13"></a>                     <span class="dt">parms=</span>klin, <span class="dt">knonlin=</span>knonlin)</span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="co"># The solution of the 4-variable system is oscillatory, showing only the first </span></span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="co"># variable here</span></span>
+<span id="cb10-16"><a href="#cb10-16"></a><span class="kw">plot</span>(sol[,<span class="dv">1</span>],sol[,<span class="dv">2</span>],<span class="dt">type=</span><span class="st">&#39;l&#39;</span>,<span class="dt">xlab=</span><span class="st">&#39;time&#39;</span>,<span class="dt">ylab =</span><span class="st">&#39;variable 1&#39;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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CwEhIALSMyAEhEBuCIiAcoNeGQsBISAC0jMgBIRAbgiIgHKDXhkLASEgAtIzIASEQG4IiIByg14ZCwEhIALSMyAEhEBuCIiAcoNeGQsBISAC0jMgBIRAbgiIgHKDXhkLASEgAtIzIASEQG4IiIByg14ZCwEhIALSMyAEhEBuCIiAcoNeGQsBISAC0jMgBIRAbgiIgHKDXhkLASEgAtIzIASEQG4IiIByg14ZCwEhIALSMyAEhEBuCJSegCqVipk9e7b55JNPcgNRGQsBIZAOgVIS0L/+9S9z8sknm27dupn555/fLLXUUqZz585m0UUXNeuuu6454YQTzJdffpkOEd0lBIRAZgi0c1oQlcxyq0NG06dPN5tssolp166d2XPPPU337t1Np06d7D6toPfee8/ccccdhmI99NBDZuWVV65DrkpCCAiBRiBQOgI6+uijzSuvvGL+/ve/mwUWWCAQk++//95sv/32pl+/fubss88OvKbWg5dddpm5+uqrbaur1rR0vxBoBAILLrigGT9+vFlkkUUakXxd0py3LqlkmMikSZPMgQceGEo+qDLffPOZQYMGmcsvv7xhBHTjjTeaSy65RASUYd0rq2QIbL755ubdd9+1Zolkd2Z3dekIqG/fvubJJ580hxxySFWUHn74YbPssstWvaaWk/POO6/p2LGj2WijjWpJRvcKgYYh8POf/7xhadcr4dIR0K9+9SsDCX344Ydm3333tTYeDNDt27e3I2HTpk0zN910k7nvvvtsN61eQCkdISAE6o9A6QhovfXWM6+++qo57LDDbFfsp59+aoPKVlttZR544AHTv3//Nuea4cCbb75pvvnmG7POOutY4m2GMqkMcycCpSMgqmmVVVaxI1zfffedmTFjhqHVg+G5a9euZrnllrND8s1anc8995xtAS699NJm5syZzVpMlWsuQaCUfkBu3eADBBnR4qG188MPP9hu2I8//uhe0lS/tPaOOeYYc+utt1qyZYRDIgTKjEDpCGjkyJHmjDPOaIX5iBEjrC9Q7969DYa31VZbzXbBWl3UBDtPPfWU9foeMGCAGTx4sLn33nuboFQqwtyMQOm6YNh/mHrhynXXXWdOO+00s+WWWxoM1J9//rm5+eabzW677WZ4YbEZNYsw7I8HOAZ3HDH5kwiBMiNQOgLygz1mzBg7FI5joivHHnus6dmz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5ppr1inFbJMRAWWLt3ITAkLAg4C6YB4wtCkEhEC2CIiAssVbuQkBIeBBQATkAUObQkAIZIuACChbvJWbEBACHgREQB4wtCkEhEC2CIiAssVbuQkBIeBBQATkAUObQkAIZIuACChbvJWbEBACHgREQB4wtCkEhEC2CIiAssVbuQkBIeBBQATkAaMem6xJLykWAqyewpypMClbnUWVJ6ycRTwuAqpTrbz88st2oUTWA+vevbs599xz65RyPsnceeedZvXVV2/zx/EyyXvvvWeXa2K5JL+w4sdmm21mOnToYDbccEMzceJE/yWF269WHlYLDqozJhMXVUq3MGERgWStqYEDB5o+ffrYJWxeeeUVc9RRR9nVWlmmp4zCsjWUa9CgQa3UX2mllVrtF3mHl3WXXXYxLF3jl8cee8wceuihZuTIkeaSSy4xo0aNMttvv7159tlnzTrrrOO/vBD71cqDgpAss+J5Dr0y33zzeXeLte00PyU1InDWWWdVOnbsWPnmm29aUjr77LMrSyyxRMVZibPlWJk2nHXvKw75lEnlVrpeddVVFWd9toqzZhZ94so999zT6vwaa6xRcZb2bnVsrbXWqhx00EGtjhVlJ6o8Dsnact57771FUTmWHuqC1eF7MGHCBPv1XHDBBVtS23XXXe1icc8//3zLsTJtsPz1+uuvb1UOWv666GUZNmyYGTJkiLnvvvvaqMpSxq+//roZMGBAq3PUWdD1rS7KaadaeVBp8uTJVrOy1ZkIqA4P1DvvvGOWXXbZVim5+x988EGr42XYQefZs2ebN954w2yxxRYGYu3Zs6d5/PHHy6C+1RGb3IgRI8z888/fRue3337bHnPryL2AfcpdRMKtVh70p9vPirxXX321WWWVVcxiiy1m9tprL1set3xF/BUB1aFWPv/88zbr0fMAIERILJvwMCNPPvmk2Xvvvc2ZZ55pH2TIiJZRGWTJJZcMVfOLL76w5zp37tzqGgYQGC0Lshm1ujCHnWrlQR3qBWPz1KlTjdP9N7vvvrsZP3682XrrrauOAOZQlFZZygjdCo50Oxj5CMPqFXf/+++/9x4uxbZjHzGjR482e+65p/2SojQjLF27djXnnHOOueOOO0pRjjAl5533/x57t4781zHMXTZhsACy4YOBOPYtO7LHYAgjl7SGiihqAdWhVpZeemlD7GSvzJkzx+4ussgi3sOl2F5hhRUs4bitOJTu0qWL2XTTTW1TvxSFqKLkMsssY8+6deRe6tahM6DgHirN7yabbNJCPq7Se+yxhx2JnTRpknuocL8ioDpUCQTkt/XMmjXLprzyyivXIYdsk5gxY4Z55pln2mSKLajQQ7ptNA4+QH0hbh25V1GHzsilKeNH46WXXjLYIr1CXbVv3z7QDua9Ls9tEVAd0N9qq62sD4bX29YZDjV8SXv16lWHHLJN4tprrzV9+/a1Rmg3Z1oLDz30kOndu7d7qLS/tIB69OhhqCOvOEP11ujuPVaW7f3228/Q4vHKuHHjzA8//FDsZzDWYL0uqorA+++/X3G+NhWnv1355JNPKo5HbaVTp04Vx8Gt6n1FPeks81JZaKGFKo5NoeI03yuOIb3iPOCVBRZYoDJlypSiqh2o18yZMwP9gJzRoorToqs49qzKZ599Vhk+fLjdd4y4gekU5WBYeRyHSltOfNI++uijygsvvFBZddVVK84HsOKM6hVF/TZ6mDZHdCAVAji64XjofIEs+ThethXn65MqrSLcRHkcW5AtD2VyhnYrjnd0EVRLpEPYC0vdHH/88fbDQflwTHSmZiRKO4+Lw8oDyZxyyikVx+3A1pljaK/svPPO9oOYh55x89S6YN42a43bDuhm+vTpdhE/d6SlxiRzvZ3y4LSHLw1G6GYUx1PdOC0Gg+G9GYQRvGnTptlnkDluRRcRUNFrSPoJgSZGQEboJq5cFU0IFB0BEVDRa0j6CYEmRkAE1MSVq6IJgaIjIAIqeg1JPyHQxAiIgJq4clU0IVB0BERARa8h6ScEmhgBEVATV66KJgSKjoAIqOg1JP2EQBMjIAJq4spV0YRA0REQARW9hqSfEGhiBERATVy5KpoQKDoCIqCi15D0EwJNjIAIqIkrV0UTAkVHQARU9BqSfkKgiREQATVx5apoQqDoCIiAil5D0k8INDECIqAmrlwVTQgUHQERUNFrSPoJgSZGQATUxJWrogmBoiMgAip6DUk/IdDECIiAmrhyVTQhUHQEREBFryHpJwSaGAERUBNXroomBIqOgAio6DUk/YRAEyMgAmriylXRhEDRERABFb2GSqjfxx9/bJx11ls0P/TQQ02vXr1a9rUhBFwE5nU39CsE6oXAYYcdZr755htz4IEH2iQ33nhjs8wyy9QreaXTRAiIgJqoMotSlJ9++sm0a9euRZ3Bgwe3bGtDCHgRUBfMi4a2a0ZgyJAhZuLEieaJJ54wvXv3NrNmzTLDhg0z++23X0va/fv3N/fff7+hpUTLaN111zW33HKL+eqrr2yrqUuXLmannXYyDz/8cMs9bEyePNlss802plOnTmbVVVc1p512mvn+++9bXaOdciEgAipXfRVe29122810797ddOvWzRxzzDGmY8eOZvr06eb1119v0X3SpEmGVtHs2bPNueeeaxZeeGFz0EEHma233trMmTPHjBgxwp7DduQK9/fp08d8+umn5uKLLzYnnXSSGTNmjDnggAPcS/RbQgTUBSthpRVZ5S233NKssMIK5rvvvjP7779/qKpdu3Y1t99+u5lnnnlMz549rZGae+6++257z1prrWUJ54033jCrr766Of30002HDh1sy2qBBRaw13Tu3NkMHDjQkhFpSMqHgAiofHXWFBr37dvXkg+FgWyQHXbYwf7yD4JCpk6dagnoscceM/369TMvvviiPc6/RRdd1LRv394888wzlsRaTmijNAiIgEpTVc2lqEswlIpWELLiiivaX/65x9j++uuvDUP748aNs38c88q0adO8u9ouEQIioBJVVjOpOu+88R+9hRZayPB35JFHmosuuqgNDN4RtzYndaDQCMgIXejqKadyEMKPP/5YN+VJb8011zS33XabTZN9/t566y2Dzenpp5+uW15KKFsEREDZ4j1X5LbIIouYKVOmmAkTJtih9XoUeujQoWbmzJl29Oy1114zL7/8sh05YyRtgw02qEcWSiMHBERAOYDe7FkyNP7555+b7bbbzjz//PN1Ke6AAQPM6NGjzfjx402PHj2sQXrxxRc3Y8eONUm6c3VRRonUDYF2FUfqlpoSEgL/jwCPFT47OA3WW2bMmGGWXHJJaxeqd9pKL1sEREDZ4q3chIAQ8CCgLpgHDG0KASGQLQIioGzxVm5CQAh4EBABecDQphAQAtkiIALKFm/lJgSEgAcBEZAHDG0KASGQLQIioGzxVm5CQAh4EBABecDQphAQAtkiIALKFm/lJgSEgAcBEZAHDG0KASGQLQIioGzxVm5CQAh4EBABecDQphAQAtkiIALKFm/lJgSEgAcBEZAHDG0KASGQLQIioGzxVm5CQAh4EBABecDQphAQAtkiIALKFm/lJgSEgAcBEZAHDG0KASGQLQIioGzxVm5CQAh4EBABecDQphAQAtkiIALKFm/lJgSEgAcBEZAHDG0KASGQLQIioGzxVm5CQAh4EPgvZc3uaSReFCAAAAAASUVORK5CYII=" /><!-- --></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># Set the last point of the numeric solution as point of interest, omit the </span></span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="co"># first column (it contains the time)</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>s_star &lt;-<span class="st"> </span>sol[<span class="kw">dim</span>(sol)[<span class="dv">1</span>],<span class="dv">2</span><span class="op">:</span><span class="kw">dim</span>(sol)[<span class="dv">2</span>]]</span></code></pre></div>
+<p>State variable values of interest could be steady state values, values at a specific point in time (e.g. after a stimulus) or even a set of values (see section <em>Determining loops over a set of variable values</em>).</p>
+</div>
+<div id="calculating-the-jacobian-matrix" class="section level2">
+<h2>Calculating the Jacobian matrix</h2>
+<p>The function <code>jacobian</code> from the <code>numDeriv</code> package can be used to determine numerically the Jacobian matrix of an ODE system at a certain set of values for the variables, <code>s_star</code>. The approach is that of finite differences (with real step) or complex step approach, the latter of which is supposed to deliver more exact results [Martins et al., 2003].</p>
+<p>The input function, in the example <code>func_POSm4</code> (positive feedback chain model from [Baum et al., 2016]) defines the time derivatives of the modelled variables as a vector: <span class="math inline">\(f_i(s)=dS_i/dt\)</span>. Note that only those input arguments to the function that encode the modelled variables (and hence in whose direction the partial derivatives are taken) are allowed to be called <code>x</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>klin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">165</span>,<span class="fl">0.044</span>,<span class="fl">0.27</span>,<span class="dv">550</span>,<span class="dv">5000</span>,<span class="dv">78</span>,<span class="fl">4.4</span>,<span class="fl">5.1</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>knonlin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.3</span>,<span class="dv">2</span>)</span>
+<span id="cb12-3"><a href="#cb12-3"></a>j_matrix &lt;-<span class="st"> </span>numDeriv<span class="op">::</span><span class="kw">jacobian</span>(func_POSm4,s_star,<span class="dt">method=</span><span class="st">&quot;complex&quot;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4"></a>                               <span class="dt">t=</span><span class="dv">1</span>,<span class="dt">klin=</span>klin,<span class="dt">knonlin=</span>knonlin,)</span>
+<span id="cb12-5"><a href="#cb12-5"></a>j_matrix</span></code></pre></div>
+<pre><code>##            [,1]  [,2]  [,3]     [,4]
+## [1,] -1.2396132     0   0.0 -85.9719
+## [2,]  0.9696132 -5550   0.0  85.9719
+## [3,]  0.0000000   550 -82.4   0.0000
+## [4,]  0.0000000     0  78.0  -5.1000</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>signed_jacobian &lt;-<span class="st"> </span><span class="kw">sign</span>(j_matrix)</span></code></pre></div>
+<p>The (i,j)th entry of the Jacobian matrix denotes the partial derivative of variable <span class="math inline">\(S_i\)</span> with respect to variable <span class="math inline">\(S_j\)</span>, <span class="math inline">\(J_{ij}=\delta S_i/\delta S_j\)</span>, which is positive if <span class="math inline">\(S_j\)</span> has a direct positive effect on <span class="math inline">\(S_i\)</span>, negative if <span class="math inline">\(S_j\)</span> has a direct negative effect on <span class="math inline">\(S_i\)</span> and zero if <span class="math inline">\(S_j\)</span> does not have a direct effect on <span class="math inline">\(S_i\)</span>. For example, the entry in row 2, column 4, <span class="math inline">\(J_{24}\)</span>, of the <code>signed_jacobian</code> matrix above is positive, meaning that in the underlying ODE model, variable 4 positively regulates variable 2.</p>
+</div>
+<div id="computing-all-feedback-loops-and-useful-functions-for-loop-search" class="section level2">
+<h2>Computing all feedback loops and useful functions for loop search</h2>
+<p>The Jacobian matrix is used to compute feedback loops in the generated interaction graph. The default function for this is <code>find_loops</code>, in that strongly connected components are determined to reduce runtime. For smaller systems, the function <code>find_loops_noscc</code> skips this step and thus can be faster. The optional second input argument, <code>max_num_loops</code>, sets an upper limit to the number of detected and reported loops and thus can prevent overly long runtime (but also potentially not all loops are returned).</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># Determine the loop_list from Jacobian matrix j_matrix</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a>loop_list &lt;-<span class="st"> </span><span class="kw">find_loops</span>(j_matrix)</span>
+<span id="cb15-3"><a href="#cb15-3"></a>loop_list</span></code></pre></div>
+<pre><code>##           loop length sign
+## 1         1, 1      1   -1
+## 2         2, 2      1   -1
+## 3         3, 3      1   -1
+## 4         4, 4      1   -1
+## 5 3, 4, 1,....      4   -1
+## 6   3, 4, 2, 3      3    1</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># The signed Jacobian matrix can be supplied instead, delivering the same results</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a>loop_list &lt;-<span class="st"> </span><span class="kw">find_loops</span>(signed_jacobian)</span>
+<span id="cb17-3"><a href="#cb17-3"></a>loop_list</span></code></pre></div>
+<pre><code>##           loop length sign
+## 1         1, 1      1   -1
+## 2         2, 2      1   -1
+## 3         3, 3      1   -1
+## 4         4, 4      1   -1
+## 5 3, 4, 1,....      4   -1
+## 6   3, 4, 2, 3      3    1</code></pre>
+<p>The output loop list is an R data.frame with one row for each detected loop. The column <code>loop</code> contains the order of the variables that form the loop (as vector in a list); <code>length</code> contains the loop length (i.e. the number of variables involved); <code>sign</code> denotes whether the loop is negative, <code>-1</code>, or positive, <code>1</code>. The data.frame can be queried as usual for single loops or loops of a certain length or sign.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="co"># Retrieve fifth loop</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a>loop_list[<span class="dv">5</span>,<span class="dv">1</span>] </span></code></pre></div>
+<pre><code>## [[1]]
+## [1] 3 4 1 2 3</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># In order to obtain the vector of the order of variables of a loop, you have to </span></span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="co"># call the list element</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a>loop_list[<span class="dv">5</span>,<span class="dv">1</span>][[<span class="dv">1</span>]]</span></code></pre></div>
+<pre><code>## [1] 3 4 1 2 3</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="co"># Retrieve all loops of length 4</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a>loop_list[loop_list<span class="op">$</span>length<span class="op">==</span><span class="dv">4</span>,] </span></code></pre></div>
+<pre><code>##           loop length sign
+## 5 3, 4, 1,....      4   -1</code></pre>
+<p>The LoopDetectR function <code>loop_summary</code> provides a convenient report on total number of loops, subdivided by their lengths (<code>len_i</code>) and signs (<code>all</code>, <code>pos</code>, <code>neg</code>).</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">loop_summary</span>(loop_list)</span></code></pre></div>
+<pre><code>##     len_1 len_2 len_3 len_4
+## all     4     0     1     1
+## pos     0     0     1     0
+## neg     4     0     0     1</code></pre>
+<p>One can filter the loop list for loops containing specific variables, for example the one with index 2:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="co"># Index of node of interest</span></span>
+<span id="cb27-2"><a href="#cb27-2"></a>noi &lt;-<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb27-3"><a href="#cb27-3"></a><span class="co"># Return all loops from loop_list containing node 2</span></span>
+<span id="cb27-4"><a href="#cb27-4"></a>loop_list[<span class="kw">vapply</span>(loop_list<span class="op">$</span>loop,<span class="cf">function</span>(x){noi <span class="op">%in%</span><span class="st"> </span>x},<span class="kw">logical</span>(<span class="dv">1</span>)),]</span></code></pre></div>
+<pre><code>##           loop length sign
+## 2         2, 2      1   -1
+## 5 3, 4, 1,....      4   -1
+## 6   3, 4, 2, 3      3    1</code></pre>
+<p>The LoopDetectR function <code>find_edge</code> can be used to search a loop list for loops containing specific edges defined by the indices of the ingoing and outgoing nodes. This example returns the indices of all loops with a regulation of node 3 by node 2. These are only two here.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a><span class="co"># Obtain the indices of the loops with edge &#39;2 regulates 3&#39; in loop_list </span></span>
+<span id="cb29-2"><a href="#cb29-2"></a>loop_edge_ind &lt;-<span class="st"> </span><span class="kw">find_edge</span>(loop_list,<span class="dt">source_node=</span><span class="dv">2</span>,<span class="dt">target_node=</span><span class="dv">3</span>);</span>
+<span id="cb29-3"><a href="#cb29-3"></a>loops_with_edge_<span class="dv">2</span>_to_<span class="dv">3</span> &lt;-<span class="st"> </span>loop_list[loop_edge_ind,]</span>
+<span id="cb29-4"><a href="#cb29-4"></a>loops_with_edge_<span class="dv">2</span>_to_<span class="dv">3</span></span></code></pre></div>
+<pre><code>##           loop length sign
+## 5 3, 4, 1,....      4   -1
+## 6   3, 4, 2, 3      3    1</code></pre>
+<p>Loop lists can be saved and loaded as R objects using the usual save (or saveRDS) and load (loadRDS) R functions. Saving the loop list into table files is possible, but the vectors containing the loops are saved as string <code>&quot;c(x,y,z)&quot;</code> and need special handling when loading back into R or into other programming language frameworks.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="co"># This writes a file &#39;looplist_func_POSm4.RData&#39;</span></span>
+<span id="cb31-2"><a href="#cb31-2"></a><span class="kw">save</span>(loop_list,<span class="dt">file=</span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(),<span class="st">&#39;looplist_func_POSm4.RData&#39;</span>)) </span>
+<span id="cb31-3"><a href="#cb31-3"></a><span class="co"># This loads the object &#39;loop_list&#39; into the workspace</span></span>
+<span id="cb31-4"><a href="#cb31-4"></a><span class="kw">load</span>(<span class="kw">file.path</span>(<span class="kw">tempdir</span>(),<span class="st">&#39;looplist_func_POSm4.RData&#39;</span>))</span>
+<span id="cb31-5"><a href="#cb31-5"></a></span>
+<span id="cb31-6"><a href="#cb31-6"></a><span class="co"># This saves the loop list into a table with separation by tab</span></span>
+<span id="cb31-7"><a href="#cb31-7"></a><span class="kw">write.table</span>(loop_list,<span class="dt">file=</span><span class="kw">file.path</span>(<span class="kw">tempdir</span>(),<span class="st">&#39;looplist_func_POSm4.txt&#39;</span>),</span>
+<span id="cb31-8"><a href="#cb31-8"></a>            <span class="dt">sep=</span><span class="st">&#39;</span><span class="ch">\t</span><span class="st">&#39;</span>,<span class="dt">quote=</span>F,<span class="dt">row.names=</span>F)</span>
+<span id="cb31-9"><a href="#cb31-9"></a><span class="co"># This reads the loop list back into the R session, as object ll</span></span>
+<span id="cb31-10"><a href="#cb31-10"></a>ll &lt;-<span class="st"> </span><span class="kw">read.table</span>(<span class="kw">file.path</span>(<span class="kw">tempdir</span>(),<span class="st">&#39;looplist_func_POSm4.txt&#39;</span>),</span>
+<span id="cb31-11"><a href="#cb31-11"></a>                 <span class="dt">header=</span>T,<span class="dt">sep=</span><span class="st">&#39;</span><span class="ch">\t</span><span class="st">&#39;</span>)</span>
+<span id="cb31-12"><a href="#cb31-12"></a>ll</span></code></pre></div>
+<pre><code>##               loop length sign
+## 1          c(1, 1)      1   -1
+## 2          c(2, 2)      1   -1
+## 3          c(3, 3)      1   -1
+## 4          c(4, 4)      1   -1
+## 5 c(3, 4, 1, 2, 3)      4   -1
+## 6    c(3, 4, 2, 3)      3    1</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># This transforms the &quot;c(x,y,z)&quot;-entries into the format used by LoopDetectR</span></span>
+<span id="cb33-2"><a href="#cb33-2"></a>ll<span class="op">$</span>loop &lt;-<span class="st"> </span><span class="kw">lapply</span>(ll<span class="op">$</span>loop,<span class="cf">function</span>(x){<span class="kw">eval</span>(<span class="kw">parse</span>(<span class="dt">text=</span>x))})</span>
+<span id="cb33-3"><a href="#cb33-3"></a>ll</span></code></pre></div>
+<pre><code>##            loop length sign
+## 1          1, 1      1   -1
+## 2          2, 2      1   -1
+## 3          3, 3      1   -1
+## 4          4, 4      1   -1
+## 5 3, 4, 1, 2, 3      4   -1
+## 6    3, 4, 2, 3      3    1</code></pre>
+</div>
+<div id="computing-feedback-loops-over-multiple-sets-of-variable-values-of-interest" class="section level2">
+<h2>Computing feedback loops over multiple sets of variable values of interest</h2>
+<p>In this example of a model of the bacterial cell cycle [Li et al., 2008], it is demonstrated how feedback loops can be determined over multiple sets of variable values. Here, it is focused on the solution of the ODE systems along the time axis (provided as data in the package, <em>li08_solution.RData</em>).</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># Load in the example ODE model function func_li08, the kinetic parameters are</span></span>
+<span id="cb35-2"><a href="#cb35-2"></a><span class="co"># defined within the function, and the function returns a vector of the time</span></span>
+<span id="cb35-3"><a href="#cb35-3"></a><span class="co"># derivatives (in the same order as the modelled variables in the arguments)</span></span>
+<span id="cb35-4"><a href="#cb35-4"></a><span class="kw">data</span>(<span class="st">&quot;func_li08&quot;</span>)</span>
+<span id="cb35-5"><a href="#cb35-5"></a><span class="co"># Load sets of variable values (solution to the ODE over time)</span></span>
+<span id="cb35-6"><a href="#cb35-6"></a><span class="kw">data</span>(<span class="st">&quot;li08_solution&quot;</span>) <span class="co">#loads the data.frame li08_solution, columns: variables</span></span>
+<span id="cb35-7"><a href="#cb35-7"></a><span class="co"># Cast the solution into the correct list format and remove time (first column)</span></span>
+<span id="cb35-8"><a href="#cb35-8"></a>li08_sol_list &lt;-<span class="st"> </span><span class="kw">as.list</span>(<span class="kw">as.data.frame</span>(<span class="kw">t</span>(li08_solution[,<span class="op">-</span><span class="dv">1</span>])))</span>
+<span id="cb35-9"><a href="#cb35-9"></a><span class="co"># Compute all different loop lists along the solution</span></span>
+<span id="cb35-10"><a href="#cb35-10"></a>res_tab &lt;-<span class="st"> </span><span class="kw">find_loops_vset</span>(func_li08,<span class="dt">vset=</span>li08_sol_list,<span class="dt">t=</span><span class="dv">1</span>,</span>
+<span id="cb35-11"><a href="#cb35-11"></a>                           <span class="dt">compute_full_list=</span><span class="ot">FALSE</span>)</span></code></pre></div>
+<p>The solutions of the example ODE model give rise to seven different loop lists that are saved as elements of the list <code>res_tab$loop_rep</code>. Here, two examples of resulting loop lists are given (without self-loops).</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>loop_list_<span class="dv">2</span> &lt;-<span class="st"> </span>res_tab<span class="op">$</span>loop_rep[[<span class="dv">2</span>]][res_tab<span class="op">$</span>loop_rep[[<span class="dv">2</span>]]<span class="op">$</span>length<span class="op">&gt;</span><span class="dv">1</span>,]</span>
+<span id="cb36-2"><a href="#cb36-2"></a>loop_list_<span class="dv">2</span></span></code></pre></div>
+<pre><code>##          loop length sign
+## 16 6, 7, 1, 6      3   -1
+## 17    6, 7, 6      2    1
+## 18    2, 3, 2      2   -1</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>loop_list_<span class="dv">7</span> &lt;-<span class="st"> </span>res_tab<span class="op">$</span>loop_rep[[<span class="dv">7</span>]][res_tab<span class="op">$</span>loop_rep[[<span class="dv">7</span>]]<span class="op">$</span>length<span class="op">&gt;</span><span class="dv">1</span>,]</span>
+<span id="cb38-2"><a href="#cb38-2"></a>loop_list_<span class="dv">7</span></span></code></pre></div>
+<pre><code>##            loop length sign
+## 15      1, 2, 1      2   -1
+## 16   1, 3, 2, 1      3    1
+## 17      2, 3, 2      2   -1
+## 18 5, 7, 1,....      4   -1
+## 19 6, 7, 1,....      5    1
+## 20   6, 7, 1, 6      3   -1
+## 21      6, 7, 6      2    1
+## 22 10, 11, ....      6    1
+## 23 10, 12, ....      3   -1
+## 24 10, 13, ....      4   -1
+## 25 10, 14, ....      8   -1
+## 26 10, 14, ....      7    1</code></pre>
+<p>The entry <code>res_tab$loop_rep_index</code> is a vector of the same length as the number of different states at which the loops were determined (<code>length(li08_sol_list)</code>), and returns which entry of <code>res_tab$loop_rep</code> belongs to each input state.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="co"># Determine the loop list belonging to the 10th up to 20th input state. </span></span>
+<span id="cb40-2"><a href="#cb40-2"></a><span class="co"># It is loop_list_2 for all of these input states.</span></span>
+<span id="cb40-3"><a href="#cb40-3"></a>res_tab<span class="op">$</span>loop_rep_index[<span class="dv">10</span><span class="op">:</span><span class="dv">20</span>]</span></code></pre></div>
+<pre><code>##  [1] 2 2 2 2 2 2 2 2 2 2 2</code></pre>
+<p>Similarly, <code>res_tab$jac_rep</code> and <code>res_tab$jac_rep_index</code> capture the different Jacobian matrices and for each input state which Jacobian belongs to it.</p>
+<p>Results of this analysis could be plotted along the solution and analyzed further to discover reasons of changing loops. Please note that in order to obtain the sample solution in <em>li08_solution.RData</em> also event functions are required; the solution cannot be retrieved from integrating <code>func_li08</code> alone. Please refer to the model’s publication [Li et al., 2008] for details.</p>
+</div>
+<div id="comparing-two-loop-lists" class="section level2">
+<h2>Comparing two loop lists</h2>
+<p>LoopDetectR provides a function for comparing the loops of two systems, <code>compare_loop_list</code>. For a meaningful comparison, the loop indices in the compared systems should point to the same variables. This could be the case when regulations change within one system between different sets of variables of interest (along a dynamic trajectory, at different steady states of the system), or when comparing different systems in which one or more regulations are altered (as in the below example the positive feedback chain model vs. the negative feedback chain model, [Baum et al., 2016]).</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a><span class="co"># Load the ODE function of the positive feedback chain model</span></span>
+<span id="cb42-2"><a href="#cb42-2"></a><span class="kw">data</span>(func_POSm4)</span>
+<span id="cb42-3"><a href="#cb42-3"></a><span class="co"># Set kinetic parameters</span></span>
+<span id="cb42-4"><a href="#cb42-4"></a>klin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">165</span>,<span class="fl">0.044</span>,<span class="fl">0.27</span>,<span class="dv">550</span>,<span class="dv">5000</span>,<span class="dv">78</span>,<span class="fl">4.4</span>,<span class="fl">5.1</span>)</span>
+<span id="cb42-5"><a href="#cb42-5"></a>knonlin &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.3</span>,<span class="dv">2</span>)</span>
+<span id="cb42-6"><a href="#cb42-6"></a><span class="co"># Compute the Jacobian matrix of the system at the state [1,1,1,1]</span></span>
+<span id="cb42-7"><a href="#cb42-7"></a>j_matrix &lt;-<span class="st"> </span>numDeriv<span class="op">::</span><span class="kw">jacobian</span>(func_POSm4,<span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">4</span>),<span class="dt">method=</span><span class="st">&quot;complex&quot;</span>,</span>
+<span id="cb42-8"><a href="#cb42-8"></a>                               <span class="dt">t=</span><span class="dv">1</span>, <span class="dt">klin=</span>klin, <span class="dt">knonlin=</span>knonlin)</span>
+<span id="cb42-9"><a href="#cb42-9"></a><span class="co"># Compute all loops for this Jacobian</span></span>
+<span id="cb42-10"><a href="#cb42-10"></a>loop_list_pos &lt;-<span class="st"> </span><span class="kw">find_loops</span>(j_matrix)</span>
+<span id="cb42-11"><a href="#cb42-11"></a></span>
+<span id="cb42-12"><a href="#cb42-12"></a><span class="co"># Function with negative regulation. The altered regulation affects </span></span>
+<span id="cb42-13"><a href="#cb42-13"></a><span class="co"># two entries of the Jacobian matrix. Parameter values and the set of </span></span>
+<span id="cb42-14"><a href="#cb42-14"></a><span class="co"># variable values remain identical.</span></span>
+<span id="cb42-15"><a href="#cb42-15"></a>j_matrix_neg &lt;-<span class="st"> </span><span class="kw">sign</span>(j_matrix)</span>
+<span id="cb42-16"><a href="#cb42-16"></a>j_matrix_neg[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="dv">4</span>] &lt;-<span class="st"> </span><span class="op">-</span><span class="kw">sign</span>(j_matrix[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>,<span class="dv">4</span>])</span>
+<span id="cb42-17"><a href="#cb42-17"></a><span class="co"># Compute the loop list for this Jacobian with altered regulation</span></span>
+<span id="cb42-18"><a href="#cb42-18"></a>loop_list_neg &lt;-<span class="st"> </span><span class="kw">find_loops</span>(j_matrix_neg);</span>
+<span id="cb42-19"><a href="#cb42-19"></a></span>
+<span id="cb42-20"><a href="#cb42-20"></a><span class="co"># Compute comparison</span></span>
+<span id="cb42-21"><a href="#cb42-21"></a>comp_inds &lt;-<span class="st"> </span><span class="kw">compare_loop_list</span>(loop_list_pos,loop_list_neg)</span>
+<span id="cb42-22"><a href="#cb42-22"></a><span class="co"># Only the four self-loops remain identical in both systems (the indices</span></span>
+<span id="cb42-23"><a href="#cb42-23"></a><span class="co"># with respect to the first input list, loop_list_pos, are saved in ind_a_id).</span></span>
+<span id="cb42-24"><a href="#cb42-24"></a>loop_list_pos[comp_inds<span class="op">$</span>ind_a_id,]</span></code></pre></div>
+<pre><code>##   loop length sign
+## 1 1, 1      1   -1
+## 2 2, 2      1   -1
+## 3 3, 3      1   -1
+## 4 4, 4      1   -1</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a><span class="co"># ind_b_id saves the indices of the corresponding loops in the negatively </span></span>
+<span id="cb44-2"><a href="#cb44-2"></a><span class="co"># regulated system, loop_list_neg.</span></span>
+<span id="cb44-3"><a href="#cb44-3"></a>loop_list_neg[comp_inds<span class="op">$</span>ind_b_id,]</span></code></pre></div>
+<pre><code>##   loop length sign
+## 1 1, 1      1   -1
+## 2 2, 2      1   -1
+## 3 3, 3      1   -1
+## 4 4, 4      1   -1</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a><span class="co"># Two loops are the same in both systems but they have switched their signs. </span></span>
+<span id="cb46-2"><a href="#cb46-2"></a><span class="co"># Their indices in the first list are saved in ind_a_switch</span></span>
+<span id="cb46-3"><a href="#cb46-3"></a>loop_list_pos[comp_inds<span class="op">$</span>ind_a_switch,]</span></code></pre></div>
+<pre><code>##           loop length sign
+## 5 3, 4, 1,....      4   -1
+## 6   3, 4, 2, 3      3    1</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># Their indices in the second list are saved in ind_b_switch </span></span>
+<span id="cb48-2"><a href="#cb48-2"></a>loop_list_neg[comp_inds<span class="op">$</span>ind_b_switch,]</span></code></pre></div>
+<pre><code>##           loop length sign
+## 5 3, 4, 1,....      4    1
+## 6   3, 4, 2, 3      3   -1</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="co"># All loops in the positively regulated system do also occur in the negatively</span></span>
+<span id="cb50-2"><a href="#cb50-2"></a><span class="co"># regulated system, i.e. ind_a_notin is empty.</span></span>
+<span id="cb50-3"><a href="#cb50-3"></a>comp_inds<span class="op">$</span>ind_a_notin</span></code></pre></div>
+<pre><code>## integer(0)</code></pre>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Baum K, Politi AZ, Kofahl B, Steuer R, Wolf J. Feedback, Mass Conservation and Reaction Kinetics Impact the Robustness of Cellular Oscillations. PLoS Comput Biol. 2016;12(12):e1005298.</p>
+<p>Li S, Brazhnik P, Sobral B, Tyson JJ. A Quantitative Study of the Division Cycle of Caulobacter crescentus Stalked Cells. Plos Comput Biol. 2008;4(1):e9.</p>
+<p>Martins JRRA, Sturdza P, Alonso JJ. The complex-step derivative approximation. ACM Trans Math Softw. 2003;29(3):245–62.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
